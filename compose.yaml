@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+
+  cli:
+    image: ghcr.io/andrejvysny/php-cli:8.1
+    environment:
+      APP_ENV: dev
+      APP_SECRET: 7a67ed5c5423e612e30c5949b60655ea
+      DATABASE_URL: postgresql://user:password@database:5432/app?serverVersion=15.4&charset=utf8
+    volumes:
+      - .:/var/www
+
+  web:
+      depends_on:
+        - database
+      image: ghcr.io/andrejvysny/php-apache:8.1
+      ports:
+        - "80:80"
+      environment:
+        APP_ENV: dev
+        APP_SECRET: 7a67ed5c5423e612e30c5949b60655ea
+        DATABASE_URL: postgresql://user:password@database:5432/app?serverVersion=15.4&charset=utf8
+      volumes:
+        - .:/var/www/html
+
+  database:
+      image: postgres:15.4
+      environment:
+        POSTGRES_DB: app
+        POSTGRES_USER: user
+        POSTGRES_PASSWORD: password
+      ports:
+        - "5432:5432"
+      volumes:
+        - db-data:/var/lib/mysql:rw
+
+volumes:
+  ###> doctrine/doctrine-bundle ###
+  db-data:
+###< doctrine/doctrine-bundle ###
